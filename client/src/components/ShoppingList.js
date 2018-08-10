@@ -7,18 +7,18 @@ import {
 } from 'reactstrap'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import uuid from 'uuid'
+import { connect } from 'react-redux'
+import { getItems } from '../actions/itemActions'
+import PropTypes from 'prop-types'
 
 class ShoppingList extends Component {
-  state = {
-    items:[
-      {id: uuid(), name: 'Eggs'},
-      {id: uuid(), name: 'Milk'},
-      {id: uuid(), name: 'Steak'},
-      {id: uuid(), name: 'Water'}
-    ]
+
+  componentDidMount() {
+    this.props.getItems()
   }
+
   render(){
-    const { items } = this.state;
+    const { items } = this.props.item;
     return(
       <Container>
 
@@ -29,7 +29,7 @@ class ShoppingList extends Component {
         const name = prompt('Enter Item')
         if(name) {
           this.setState({
-            items: [...this.state.items, {id: uuid(), name }]
+            items: [...this.props.item.items, {id: uuid(), name }]
           })
         }
       }}>
@@ -48,7 +48,7 @@ class ShoppingList extends Component {
               onClick = {
                 () => {
                   this.setState({
-                    items: this.state.items.filter(item => item.id !== id)
+                    items: this.props.item.items.filter(item => item.id !== id)
                   })
                 }
               }
@@ -65,4 +65,13 @@ class ShoppingList extends Component {
   }
 }
 
-export default ShoppingList
+ShoppingList.propTypes = {
+  getItems: PropTypes.func.isRequired,
+  items: PropTypes.object.isRequired
+}
+
+const mapStateToProps = (state) => ({
+  item: state.item
+})
+
+export default connect(mapStateToProps, { getItems })(ShoppingList)
